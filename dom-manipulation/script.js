@@ -239,7 +239,7 @@ function syncQuotes() {
             localStorage.setItem('quotes', JSON.stringify(quotes));
 
             displayAllQuotes();
-            alert('Quotes synchronized with server!');
+            alert('Quotes synced with server!');
         })
         .catch(error => {
             console.error('Error syncing quotes:', error);
