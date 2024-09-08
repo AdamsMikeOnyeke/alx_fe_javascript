@@ -20,13 +20,18 @@ function showRandomQuote(){
 
 document.getElementById('newQuote').addEventListener('click', showRandomQuote);
 
-function addQuote(){
+function createAddQuoteForm(){
     const newQuoteText = document.getElementById('newQuoteText').value;
     const newQuoteCategory= document.getElementById('newQuoteCategory').value;
+
     if (newQuoteText && newQuoteCategory){
-        quotes.push({text: newQuoteText, category:newQuoteCategory})
+        quotes.push({text: newQuoteText, category:newQuoteCategory});
+
+        quoteDisplay.innerHTML= newQuoteText;
+
         document.getElementById('newQuoteText').value='';
         document.getElementById('newQuoteCategory').value='';
+
         alert('Quote added');
     } else {
         alert('Please enter both a quote and a category');
