@@ -140,11 +140,20 @@ function fetchQuotesFromServer() {
 }
 
 function postToServer(data) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(data);
-        }, 1000);
-    });
+    return fetch('https://jsonplaceholder.typicode.com/posts', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }).then(response => response.json())
+      .then(result => {
+          console.log('Data posted to server:', result);
+          return result;
+      }).catch(error => {
+          console.error('Error posting to server:', error);
+          throw error;
+      });
 }
 
 async function syncWithServer() {
