@@ -29,9 +29,13 @@ function createAddQuoteForm(){
 
         const newQuoteElement = document.createElement('p')
         newQuoteElement.innerHTML=`New Quote: ${newQuoteText} - category:${newQuoteCategory}`
+        // quoteDisplay=''
         quoteDisplay.appendChild(newQuoteElement)
 
-        quoteDisplay.innerHTML= newQuoteText;
+        // Save the updated quotes array to local storage
+        localStorage.setItem('quotes', JSON.stringify(quotes))
+
+        // quoteDisplay.innerHTML= newQuoteText;
 
         document.getElementById('newQuoteText').value='';
         document.getElementById('newQuoteCategory').value='';
@@ -40,7 +44,53 @@ function createAddQuoteForm(){
     } else {
         alert('Please enter both a quote and a category');
     }
+
+}
+
+function loadQuotesLocalStorage(){
+    const storedQuotes= localStorage.getItem('quotes')
+    if(storedQuotes){
+        quotes.push(...JSON.parse(storedQuotes))
+        displayAllQuotes();
+    }
+}
+
+function displayAllQuotes(){
+    quoteDisplay.innerHTML='';
+    for (const quote of quotes){
+        const displayQuotesPara= document.createElement('p')
+        displayQuotesPara.innerHTML=`Quote: ${quote.text} - Category: ${quote.category}`;
+        quoteDisplay.appendChild(displayQuotesPara);
+    }
+}
+
+window.onload=function(){
+    loadQuotesLocalStorage();
+}
+
+function exportQuotesToJson() {
+    const dataStr = JSON.stringify(quotes, null, 2); // Convert to JSON format
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    // Create a link and trigger the download
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'quotes.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 
-
+function importFromJsonFile(event) {
+  const fileReader = new FileReader();
+  fileReader.onload = function(event) {
+    const importedQuotes = JSON.parse(event.target.result);
+    quotes.push(...importedQuotes);
+    saveQuotes();
+    displayAllQuotes();
+    alert('Quotes imported successfully!');
+  };
+  fileReader.readAsText(event.target.files[0]);
+}
