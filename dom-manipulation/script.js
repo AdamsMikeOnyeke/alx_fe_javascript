@@ -27,6 +27,10 @@ function createAddQuoteForm(){
     if (newQuoteText && newQuoteCategory){
         quotes.push({text: newQuoteText, category:newQuoteCategory});
 
+        const newQuoteElement = document.createElement('p')
+        newQuoteElement.innerHTML=`New Quote: ${newQuoteText} - category:${newQuoteCategory}`
+        quoteDisplay.appendChild(newQuoteElement)
+
         quoteDisplay.innerHTML= newQuoteText;
 
         document.getElementById('newQuoteText').value='';
