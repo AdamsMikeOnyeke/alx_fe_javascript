@@ -15,7 +15,7 @@ function showRandomQuote(){
     const randomQuotes= Math.floor(Math.random()*quotes.length);
     const selectedQuotes= quotes[randomQuotes];
     const quoteDisplay= document.getElementById('quoteDisplay');
-    quoteDisplay.textContent= selectedQuotes.text;
+    quoteDisplay.innerHTML= selectedQuotes.text;
 }
 
 document.getElementById('newQuote').addEventListener('click', showRandomQuote);
