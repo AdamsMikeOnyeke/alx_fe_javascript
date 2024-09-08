@@ -88,7 +88,7 @@ function importFromJsonFile(event) {
   fileReader.onload = function(event) {
     const importedQuotes = JSON.parse(event.target.result);
     quotes.push(...importedQuotes);
-    // saveQuotes();
+    saveQuotes();
     displayAllQuotes();
     populateCategories();
     alert('Quotes imported successfully!');
@@ -127,8 +127,7 @@ function filterQuotes() {
 
 document.getElementById('categoryFilter').addEventListener('change', filterQuotes);
 
-// Simulate server interaction
-function fetchServerData() {
+function fetchQuotesFromServer() {
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve([
@@ -162,11 +161,19 @@ async function syncWithServer() {
         alert('Data synced with server successfully!');
     } catch (error) {
         console.error('Error syncing with server:', error);
+        alert('Error syncing with server.');
     }
 }
 
-const syncButton = document.createElement('button');
-syncButton.id = 'syncWithServer';
-syncButton.textContent = 'Sync with Server';
-document.body.appendChild(syncButton);
+function setupPeriodicSync() {
+    setInterval(syncWithServer, 60000); // Fetch data every 60 seconds
+}
+
+window.onload = function() {
+    loadQuotesLocalStorage();
+    setupPeriodicSync();
+}
+
 document.getElementById('syncWithServer').addEventListener('click', syncWithServer);
+document.getElementById('exportQuotes').addEventListener('click', exportQuotesToJson);
+document.getElementById('importQuotes').addEventListener('change', importFromJsonFile);
