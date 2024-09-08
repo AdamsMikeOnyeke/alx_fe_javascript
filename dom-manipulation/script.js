@@ -131,7 +131,6 @@ function fetchQuotesFromServer() {
     return fetch('https://jsonplaceholder.typicode.com/posts')
         .then(response => response.json())
         .then(data => {
-            // Assuming the data needs transformation to match quote structure
             return data.slice(0, 5).map(post => ({
                 text: post.title, // Use title as the quote text
                 category: "General" // Use a default category for demonstration
@@ -156,18 +155,29 @@ function postToServer(data) {
       });
 }
 
+function syncQuotes() {
+    return fetchQuotesFromServer()
+        .then(serverQuotes => {
+            const serverQuoteTexts = new Set(serverQuotes.map(q => q.text));
+
+            const mergedQuotes = [...serverQuotes, ...quotes.filter(q => !serverQuoteTexts.has(q.text))];
+
+            quotes.length = 0;
+            quotes.push(...mergedQuotes);
+            localStorage.setItem('quotes', JSON.stringify(quotes));
+
+            displayAllQuotes();
+            alert('Quotes synchronized with server!');
+        })
+        .catch(error => {
+            console.error('Error syncing quotes:', error);
+            alert('Failed to sync quotes with server.');
+        });
+}
+
 async function syncWithServer() {
     try {
-        const serverQuotes = await fetchQuotesFromServer();
-        const serverQuoteTexts = new Set(serverQuotes.map(q => q.text));
-
-        const mergedQuotes = [...serverQuotes, ...quotes.filter(q => !serverQuoteTexts.has(q.text))];
-
-        quotes.length = 0;
-        quotes.push(...mergedQuotes);
-        localStorage.setItem('quotes', JSON.stringify(quotes));
-
-        displayAllQuotes();
+        await syncQuotes();
         alert('Data synced with server successfully!');
     } catch (error) {
         console.error('Error syncing with server:', error);
