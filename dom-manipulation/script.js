@@ -128,3 +128,92 @@ function filterQuotes(){
 }
 
 document.getElementById('categoryFilter').addEventListener('change', filterQuotes);
+
+// Simulate server interaction
+function fetchServerData() {
+    // Simulate network delay
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve([
+                { text: "New server quote 1", category: "Inspiration" },
+                { text: "New server quote 2", category: "Motivation" }
+            ]);
+        }, 1000); // Simulate a 1-second network delay
+    });
+}
+
+function postToServer(data) {
+    // Simulate network delay
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(data);
+        }, 1000); // Simulate a 1-second network delay
+    });
+}
+
+async function syncWithServer() {
+    try {
+        // Fetch data from the server
+        const serverQuotes = await fetchServerData();
+        
+        // Simple conflict resolution: Server data takes precedence
+        const serverQuoteTexts = new Set(serverQuotes.map(q => q.text));
+        const localQuotesTexts = new Set(quotes.map(q => q.text));
+        
+        // Merge data and resolve conflicts
+        const mergedQuotes = [...serverQuotes, ...quotes.filter(q => !serverQuoteTexts.has(q.text))];
+        
+        // Update local storage
+        quotes.length = 0;
+        quotes.push(...mergedQuotes);
+        localStorage.setItem('quotes', JSON.stringify(quotes));
+
+        // Update display
+        displayAllQuotes();
+
+        // Notify user
+        alert('Data synced with server successfully!');
+    } catch (error) {
+        console.error('Error syncing with server:', error);
+    }
+}
+
+// Add event listener for syncing with server
+document.getElementById('syncWithServer').addEventListener('click', syncWithServer);
+
+// Function to handle adding new quotes
+function createAddQuoteForm() {
+    const newQuoteText = document.getElementById('newQuoteText').value;
+    const newQuoteCategory = document.getElementById('newQuoteCategory').value;
+
+    if (newQuoteText && newQuoteCategory) {
+        const newQuote = { text: newQuoteText, category: newQuoteCategory };
+
+        quotes.push(newQuote);
+
+        // Save locally
+        localStorage.setItem('quotes', JSON.stringify(quotes));
+
+        // Update server
+        postToServer(quotes).then(() => {
+            displayAllQuotes();
+            populateCategories();
+            alert('Quote added and synced with server!');
+        }).catch(error => {
+            console.error('Error posting to server:', error);
+            alert('Failed to sync with server.');
+        });
+
+        // Clear input fields
+        document.getElementById('newQuoteText').value = '';
+        document.getElementById('newQuoteCategory').value = '';
+    } else {
+        alert('Please enter both a quote and a category.');
+    }
+}
+
+// Implement UI element to sync with server
+const syncButton = document.createElement('button');
+syncButton.id = 'syncWithServer';
+syncButton.textContent = 'Sync with Server';
+document.body.appendChild(syncButton);
